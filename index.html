@@ -312,12 +312,7 @@ function search(){
       if(!songs||songs.length===0){list.innerHTML='<li class="suggestion" style="justify-content:center;color:#555">未找到结果</li>';return}
       document.getElementById('listTitle').textContent='搜索结果';
       playlist=songs.map(function(s){var artists=s.artists||s.ar||[];return{id:s.id,title:s.name,author:artists.map(function(a){return a.name}).join(' / ')||'未知',pic:toHttps((s.al||s.album||{}).picUrl||''),dt:s.duration||s.dt||0}});
-      var needPic=playlist.filter(function(s){return!s.pic}).map(function(s){return s.id});
-      if(needPic.length>0)api(API+'/song/detail?ids='+needPic.join(',')).then(function(d){
-        if(d.songs){var picMap={};d.songs.forEach(function(s){if(s.al&&s.al.picUrl)picMap[s.id]=toHttps(s.al.picUrl)});
-        for(var i=0;i<playlist.length;i++)if(picMap[playlist[i].id])playlist[i].pic=picMap[playlist[i].id];
-        renderPlaylist();if(currentIndex>=0&&picMap[playlist[currentIndex].id])document.getElementById('albumArt').src=picMap[playlist[currentIndex].id]+'?param=300y300'}
-      }).catch(function(){});
+      fillMissingPics();
       document.getElementById('resultCount').textContent=playlist.length+' 首';
       renderPlaylist();if(playlist.length>0)playSong(0);saveState();
     })
@@ -330,6 +325,21 @@ function renderPlaylist(){
   for(var i=0;i<playlist.length;i++){var s=playlist[i],active=i===currentIndex?' active':'';
     html+='<li class="song-item'+active+'" onclick="playSong('+i+')"><img class="thumb" src="'+toHttps(s.pic||'')+'?param=60y60" onerror="this.style.display=\'none\'"><div class="info"><div class="title">'+s.title+'</div><div class="artist">'+s.author+'</div></div>'+(s.dt?'<span class="dur">'+formatTime(s.dt/1000)+'</span>':'')+'</li>'}
   list.innerHTML=html;
+}
+
+function fillMissingPics(){
+  var need=playlist.filter(function(s){return!s.pic}).map(function(s){return s.id}).slice(0,50);
+  if(need.length===0)return;
+  api(API+'/song/detail?ids='+need.join(',')).then(function(d){
+    if(!d.songs)return;
+    var picMap={};d.songs.forEach(function(s){if(s.al&&s.al.picUrl)picMap[s.id]=toHttps(s.al.picUrl)});
+    var changed=false;
+    for(var i=0;i<playlist.length;i++)if(!playlist[i].pic&&picMap[playlist[i].id]){playlist[i].pic=picMap[playlist[i].id];changed=true}
+    if(!changed)return;
+    renderPlaylist();
+    if(currentIndex>=0&&playlist[currentIndex]&&playlist[currentIndex].pic)document.getElementById('albumArt').src=playlist[currentIndex].pic+'?param=300y300';
+    saveState();
+  }).catch(function(){});
 }
 
 function playSong(index){
@@ -424,7 +434,7 @@ function deletePlaylist(id){try{var pls=JSON.parse(localStorage.getItem('moe_pla
     var modeBtns=document.querySelectorAll('.mode-btn');for(var i=0;i<modeBtns.length;i++)modeBtns[i].classList.toggle('active',modeBtns[i].dataset.mode===(saved.playMode||'list'));
     playMode=saved.playMode||'list';playlist=saved.playlist;if(saved.volume!==undefined)setVolume(saved.volume);
     document.getElementById('listTitle').textContent='上次播放';document.getElementById('resultCount').textContent=playlist.length+' 首';
-    renderPlaylist();if(saved.currentIndex>=0&&saved.currentIndex<playlist.length)playSong(saved.currentIndex);
+    renderPlaylist();if(saved.currentIndex>=0&&saved.currentIndex<playlist.length)playSong(saved.currentIndex);fillMissingPics();
     return;
   }
   showSuggestions();
