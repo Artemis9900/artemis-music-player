@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   font-family:'Segoe UI','Microsoft YaHei',sans-serif;
-  background:#1e1e33;color:#fff;min-height:100vh;
+  background:#e5b28b;color:#fff;min-height:100vh;
 }
 .titlebar{
   position:fixed;top:0;left:0;right:0;z-index:200;
@@ -212,7 +212,7 @@ body{
   <div class="preset-row" id="presets"></div>
   <label>自定义颜色</label>
   <div class="color-input-row">
-    <input type="color" id="bgColorPicker" value="#1e1e33" onchange="applyBgColor(this.value)">
+    <input type="color" id="bgColorPicker" value="#e5b28b" onchange="applyBgColor(this.value)">
     <span>选色器</span>
   </div>
   <label>主题色调</label>
@@ -395,12 +395,12 @@ function toggleSettings(){document.getElementById('settingsPanel').classList.tog
 var BG_PRESETS=['#0a0a0f','#0d0d14','#12121a','#1a1a2e','#000000','#2d1b4e','#0f0c29','#1a0a2e','#111122','#0a0a1a'];
 function renderPresets(){var el=document.getElementById('presets'),saved=getBg(),html='';for(var i=0;i<BG_PRESETS.length;i++){var active=saved===BG_PRESETS[i]?' active':'';html+='<div class="preset-dot'+active+'" style="background:'+BG_PRESETS[i]+'" onclick="applyBg(\''+BG_PRESETS[i]+'\')"></div>'}el.innerHTML=html}
 function getBg(){try{return localStorage.getItem('moe_bg')||''}catch(e){return''}}
-function applyBg(bg){document.body.style.background=bg;document.body.style.backgroundSize='cover';document.body.style.backgroundAttachment='fixed';try{localStorage.setItem('moe_bg',bg)}catch(e){}renderPresets();document.getElementById('bgColorPicker').value=bg.startsWith('#')?bg:'#1e1e33'}
+function applyBg(bg){document.body.style.background=bg;document.body.style.backgroundSize='cover';document.body.style.backgroundAttachment='fixed';try{localStorage.setItem('moe_bg',bg)}catch(e){}renderPresets();document.getElementById('bgColorPicker').value=bg.startsWith('#')?bg:'#e5b28b'}
 function applyBgColor(color){applyBg(color)}
 function handleBgUpload(input){var file=input.files&&input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var url=e.target.result;document.body.style.background='url('+url+') center/cover fixed';try{localStorage.setItem('moe_bg',url)}catch(e){}renderPresets()};reader.readAsDataURL(file);input.value=''}
-function resetBg(){document.body.style.background='#1e1e33';document.body.style.backgroundSize='';document.body.style.backgroundAttachment='';try{localStorage.removeItem('moe_bg')}catch(e){}renderPresets();document.getElementById('bgColorPicker').value='#1e1e33';setAccent(1,'#507e95');setAccent(2,'#679e94');document.getElementById('accentColor1').value='#507e95';document.getElementById('accentColor2').value='#679e94'}
+function resetBg(){document.body.style.background='#e5b28b';document.body.style.backgroundSize='';document.body.style.backgroundAttachment='';try{localStorage.removeItem('moe_bg')}catch(e){}renderPresets();document.getElementById('bgColorPicker').value='#e5b28b';setAccent(1,'#507e95');setAccent(2,'#679e94');document.getElementById('accentColor1').value='#507e95';document.getElementById('accentColor2').value='#679e94'}
 function setAccent(n,color){var root=document.documentElement.style;root.setProperty('--accent'+n,color);try{localStorage.setItem('moe_accent'+n,color)}catch(e){}}
-(function(){try{if(localStorage.getItem('moe_ver')!=='3'){localStorage.removeItem('moe_bg');localStorage.removeItem('moe_accent1');localStorage.removeItem('moe_accent2');localStorage.setItem('moe_ver','3')}}catch(e){}var a1=localStorage.getItem('moe_accent1')||'#507e95';var a2=localStorage.getItem('moe_accent2')||'#679e94';setAccent(1,a1);setAccent(2,a2);document.getElementById('accentColor1').value=a1;document.getElementById('accentColor2').value=a2})();
+(function(){try{if(localStorage.getItem('moe_ver')!=='4'){localStorage.removeItem('moe_bg');localStorage.setItem('moe_ver','4')}}catch(e){}var a1=localStorage.getItem('moe_accent1')||'#507e95';var a2=localStorage.getItem('moe_accent2')||'#679e94';setAccent(1,a1);setAccent(2,a2);document.getElementById('accentColor1').value=a1;document.getElementById('accentColor2').value=a2})();
 document.addEventListener('click',function(e){var p=document.getElementById('settingsPanel');var b=document.querySelector('.settings-icon');if(p.classList.contains('open')&&!p.contains(e.target)&&e.target!==b&&!b.contains(e.target))p.classList.remove('open')});
 
 function showPlaylistDialog(){document.getElementById('playlistDialog').classList.toggle('open');document.getElementById('savedPlaylistsPanel').classList.remove('open')}
@@ -428,7 +428,7 @@ function deletePlaylist(id){try{var pls=JSON.parse(localStorage.getItem('moe_pla
 
 (function init(){
   if(!window.winAPI){var tb=document.querySelector('.titlebar-btns');if(tb)tb.style.display='none'}
-  var savedBg=getBg();if(savedBg)document.body.style.background=savedBg.indexOf('url')===0?savedBg+' center/cover fixed':savedBg;document.getElementById('bgColorPicker').value=savedBg&&savedBg.indexOf('#')===0?savedBg:'#1e1e33';
+  var savedBg=getBg();if(savedBg)document.body.style.background=savedBg.indexOf('url')===0?savedBg+' center/cover fixed':savedBg;document.getElementById('bgColorPicker').value=savedBg&&savedBg.indexOf('#')===0?savedBg:'#e5b28b';
   var saved=getSaved();
   if(saved&&saved.playlist&&saved.playlist.length>0&&Date.now()-saved.ts<86400000){
     var modeBtns=document.querySelectorAll('.mode-btn');for(var i=0;i<modeBtns.length;i++)modeBtns[i].classList.toggle('active',modeBtns[i].dataset.mode===(saved.playMode||'list'));
