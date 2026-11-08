@@ -35,7 +35,16 @@ body{
 .sidebar{
   width:260px;flex-shrink:0;
   display:flex;flex-direction:column;padding:20px 14px;
+  transition:width .25s ease,padding .25s ease,opacity .2s ease;overflow:hidden;
 }
+.sidebar.collapsed{width:0;padding-left:0;padding-right:0;opacity:0;pointer-events:none}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sidebar-head .logo{margin-bottom:0}
+.sidebar-toggle{border:none;background:transparent;color:rgba(255,255,255,.35);font-size:14px;cursor:pointer;padding:4px 7px;border-radius:6px;font-family:inherit;transition:all .15s}
+.sidebar-toggle:hover{background:rgba(255,255,255,.08);color:#fff}
+.sidebar-expand{display:none;position:fixed;top:52px;left:12px;z-index:30;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.5);color:#fff;font-size:14px;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);font-family:inherit;transition:all .15s}
+.sidebar-expand:hover{background:rgba(0,0,0,.75)}
+.sidebar.collapsed + .sidebar-expand{display:flex}
 .logo{font-size:20px;font-weight:700;margin-bottom:20px;color:var(--accent2)}
 .search-wrap{display:flex;gap:6px;margin-bottom:12px}
 .search-wrap input{
@@ -152,7 +161,10 @@ body{
 <div class="app">
   <button class="settings-icon" onclick="toggleSettings()">&#9881;</button>
   <div class="sidebar">
-    <div class="logo">Artemis</div>
+    <div class="sidebar-head">
+      <div class="logo">Artemis</div>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="折叠目录">&#171;</button>
+    </div>
     <div class="search-wrap">
       <input type="text" id="searchInput" placeholder="搜索歌曲..." autocomplete="off" autofocus>
       <button id="searchBtn" onclick="search()">搜索</button>
@@ -173,6 +185,7 @@ body{
       <ul id="songList" style="list-style:none;margin-top:6px"></ul>
     </div>
   </div>
+  <button class="sidebar-expand" onclick="toggleSidebar()" title="展开目录">&#187;</button>
 
   <div class="main">
     <img class="cover" id="albumArt" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Crect fill='%23111' width='280' height='280'/%3E%3C/svg%3E">
@@ -392,6 +405,7 @@ function toggleMute(){if(muted){setVolume(prevVolume||0.7);muted=false}else{prev
 function formatTime(s){if(!s||isNaN(s))return'00:00';var m=Math.floor(s/60),sec=Math.floor(s%60);return(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec}
 
 function toggleSettings(){document.getElementById('settingsPanel').classList.toggle('open');renderPresets()}
+function toggleSidebar(){var sb=document.querySelector('.sidebar');sb.classList.toggle('collapsed');try{localStorage.setItem('moe_sidebar',sb.classList.contains('collapsed')?'1':'0')}catch(e){}}
 var BG_PRESETS=['#0a0a0f','#0d0d14','#12121a','#1a1a2e','#000000','#2d1b4e','#0f0c29','#1a0a2e','#111122','#0a0a1a'];
 function renderPresets(){var el=document.getElementById('presets'),saved=getBg(),html='';for(var i=0;i<BG_PRESETS.length;i++){var active=saved===BG_PRESETS[i]?' active':'';html+='<div class="preset-dot'+active+'" style="background:'+BG_PRESETS[i]+'" onclick="applyBg(\''+BG_PRESETS[i]+'\')"></div>'}el.innerHTML=html}
 function getBg(){try{return localStorage.getItem('moe_bg')||''}catch(e){return''}}
@@ -427,6 +441,7 @@ function addPlaylistById(id,name){api(API+'/playlist/detail?id='+id).then(functi
 function deletePlaylist(id){try{var pls=JSON.parse(localStorage.getItem('moe_playlists')||'[]');pls=pls.filter(function(p){return p.id!==id});localStorage.setItem('moe_playlists',JSON.stringify(pls));renderSavedPlaylists()}catch(e){}}
 
 (function init(){
+  try{if(localStorage.getItem('moe_sidebar')==='1')document.querySelector('.sidebar').classList.add('collapsed')}catch(e){}
   if(!window.winAPI){var tb=document.querySelector('.titlebar-btns');if(tb)tb.style.display='none'}
   var savedBg=getBg();if(savedBg)document.body.style.background=savedBg.indexOf('url')===0?savedBg+' center/cover fixed':savedBg;document.getElementById('bgColorPicker').value=savedBg&&savedBg.indexOf('#')===0?savedBg:'#1e1e33';
   var saved=getSaved();
