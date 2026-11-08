@@ -2,8 +2,7 @@ services:
   - type: web
     name: artemis-music
     runtime: static
-    buildCommand: ""
-    staticPublishPath: .
+    staticPublishPath: ./
     routes:
       - type: rewrite
         source: /*
