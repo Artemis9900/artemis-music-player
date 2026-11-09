@@ -145,6 +145,33 @@ body{
 .lyrics-line{padding:3px 0;font-size:12px;color:#444;transition:all .3s;line-height:1.8}
 .lyrics-line.active{color:var(--accent2);font-weight:600;font-size:14px}
 .lyrics-line.prev{color:#666}
+.mobile-menu{display:none;position:fixed;top:46px;left:12px;z-index:40;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.5);color:#fff;font-size:16px;cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(10px);font-family:inherit}
+.mobile-menu:hover{background:rgba(0,0,0,.75)}
+.sidebar-backdrop{display:none;position:fixed;top:36px;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:55}
+.sidebar-backdrop.show{display:block}
+@media (max-width:768px){
+  .mobile-menu{display:flex}
+  .sidebar-expand{display:none!important}
+  .sidebar{position:fixed;left:0;top:36px;bottom:0;width:min(82vw,300px);z-index:60;background:rgba(12,12,20,.92);backdrop-filter:blur(20px);transform:translateX(-105%);transition:transform .25s ease;padding:16px 14px;overflow-y:auto;opacity:1;pointer-events:auto}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .sidebar.collapsed{width:min(82vw,300px);padding:16px 14px;opacity:1;pointer-events:auto}
+  .sidebar-toggle{display:none}
+  .main{padding:64px 16px 20px;justify-content:flex-start}
+  .cover{width:min(68vw,260px);height:min(68vw,260px);margin-bottom:20px}
+  .now-title{font-size:19px;max-width:88vw}
+  .now-artist{font-size:12px;margin-bottom:18px}
+  .controls{gap:16px;margin-bottom:16px}
+  .play-btn{width:56px;height:56px;font-size:20px}
+  .ctrl-btn{width:42px;height:42px;font-size:18px}
+  .progress-wrap{width:100%;max-width:100%}
+  .vol-row{width:100%;max-width:100%}
+  .lyrics-panel{width:100%;max-height:110px;margin-top:14px}
+  .lyrics-line{font-size:11px}
+  .lyrics-line.active{font-size:13px}
+  .settings-icon{top:44px;right:12px;width:34px;height:34px;font-size:16px}
+  .settings-panel{left:12px;right:12px;width:auto;max-height:72vh;overflow-y:auto}
+  .titlebar-title{padding-left:60px}
+}
 </style>
 </head>
 <body>
@@ -160,6 +187,8 @@ body{
 
 <div class="app">
   <button class="settings-icon" onclick="toggleSettings()">&#9881;</button>
+  <button class="mobile-menu" onclick="toggleMobileSidebar()" title="菜单">&#9776;</button>
+  <div class="sidebar-backdrop" onclick="toggleMobileSidebar()"></div>
   <div class="sidebar">
     <div class="sidebar-head">
       <div class="logo">Artemis</div>
@@ -406,6 +435,7 @@ function formatTime(s){if(!s||isNaN(s))return'00:00';var m=Math.floor(s/60),sec=
 
 function toggleSettings(){document.getElementById('settingsPanel').classList.toggle('open');renderPresets()}
 function toggleSidebar(){var sb=document.querySelector('.sidebar');sb.classList.toggle('collapsed');try{localStorage.setItem('moe_sidebar',sb.classList.contains('collapsed')?'1':'0')}catch(e){}}
+function toggleMobileSidebar(){var sb=document.querySelector('.sidebar'),bd=document.querySelector('.sidebar-backdrop');var open=sb.classList.toggle('mobile-open');if(bd)bd.classList.toggle('show',open)}
 var BG_PRESETS=['#0a0a0f','#0d0d14','#12121a','#1a1a2e','#000000','#2d1b4e','#0f0c29','#1a0a2e','#111122','#0a0a1a'];
 function renderPresets(){var el=document.getElementById('presets'),saved=getBg(),html='';for(var i=0;i<BG_PRESETS.length;i++){var active=saved===BG_PRESETS[i]?' active':'';html+='<div class="preset-dot'+active+'" style="background:'+BG_PRESETS[i]+'" onclick="applyBg(\''+BG_PRESETS[i]+'\')"></div>'}el.innerHTML=html}
 function getBg(){try{return localStorage.getItem('moe_bg')||''}catch(e){return''}}

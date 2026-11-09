@@ -1,6 +1,7 @@
 node_modules/
 release/
 dist/
+www/
 *.log
 .env
 .DS_Store

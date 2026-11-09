@@ -1,0 +1,9 @@
+{
+  "appId": "com.artemis.music",
+  "appName": "Artemis",
+  "webDir": "www",
+  "server": {
+    "url": "https://artemis-music.onrender.com",
+    "androidScheme": "https"
+  }
+}
